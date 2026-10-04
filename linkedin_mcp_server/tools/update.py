@@ -14,28 +14,61 @@ from linkedin_mcp_server.error_handler import raise_tool_error
 logger = logging.getLogger(__name__)
 
 _OPEN_EDIT_JS = """(field) => {
-  const needles = field === 'headline' ? ['headline', 'intro'] : ['about'];
   const controls = Array.from(
     document.querySelectorAll('main button, main a, main [role="button"]'),
   );
-  const match = controls.find((el) => {
-    const label = (
-      el.getAttribute('aria-label') || el.getAttribute('title') || ''
-    ).toLowerCase();
-    return label.includes('edit') && needles.some((n) => label.includes(n));
-  });
+  let match;
+  if (field === 'headline') {
+    match = controls.find((el) => {
+      const label = (
+        el.getAttribute('aria-label') || el.getAttribute('title') || ''
+      ).toLowerCase();
+      return label === 'edit profile' || label.includes('edit intro');
+    });
+  } else {
+    match = controls.find((el) => {
+      const label = (
+        el.getAttribute('aria-label') || el.getAttribute('title') || ''
+      ).toLowerCase();
+      return label.includes('edit about') || label.includes('edit summary');
+    });
+  }
   if (!match) return { status: 'not_found' };
   match.click();
   return { status: 'opened' };
 }"""
 
-_SET_FIELD_JS = """(value) => {
+_SET_FIELD_JS = """(payload) => {
+  const { value, field } = payload;
   const editors = Array.from(
     document.querySelectorAll('textarea, [contenteditable="true"], input[type="text"]'),
   ).filter((el) => el.offsetParent !== null);
   if (editors.length === 0) return { status: 'no_editor' };
-  if (editors.length > 1) return { status: 'ambiguous_editor' };
-  const editor = editors[0];
+  let editor = null;
+  if (field === 'headline') {
+    editor = editors.find((el) => {
+      const hay = [
+        el.getAttribute('aria-label') || '',
+        el.getAttribute('placeholder') || '',
+        el.getAttribute('name') || '',
+        el.getAttribute('id') || '',
+      ].join(' ').toLowerCase();
+      return hay.includes('headline') || hay.includes('intro');
+    }) || null;
+    if (!editor) editor = editors.length === 1 ? editors[0] : null;
+  } else {
+    editor = editors.find((el) => {
+      const hay = [
+        el.getAttribute('aria-label') || '',
+        el.getAttribute('placeholder') || '',
+        el.getAttribute('name') || '',
+        el.getAttribute('id') || '',
+      ].join(' ').toLowerCase();
+      return hay.includes('summary') || hay.includes('about');
+    }) || null;
+    if (!editor && editors.length === 1) editor = editors[0];
+  }
+  if (!editor) return { status: 'ambiguous_editor' };
   editor.focus();
   if ('value' in editor) {
     editor.value = value;
@@ -130,7 +163,9 @@ async def _update_field(
                 "the edit control."
             )
 
-        set_result = await page.evaluate(_SET_FIELD_JS, new_value)
+        set_result = await page.evaluate(
+            _SET_FIELD_JS, {"value": new_value, "field": field}
+        )
         if not isinstance(set_result, dict) or set_result.get("status") != "set":
             status = (
                 set_result.get("status")
