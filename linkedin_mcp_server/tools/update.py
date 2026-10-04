@@ -1,5 +1,6 @@
 """LinkedIn profile field editing tools (headline and about)."""
 
+import asyncio
 import logging
 from typing import Any
 
@@ -163,7 +164,7 @@ async def _update_field(
                 "the edit control."
             )
 
-        await page.evaluate("() => new Promise((r) => setTimeout(r, 1500))")
+        await asyncio.sleep(1.5)
 
         set_result = await page.evaluate(
             _SET_FIELD_JS, {"value": new_value, "field": field}
