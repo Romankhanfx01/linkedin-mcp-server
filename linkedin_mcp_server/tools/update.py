@@ -163,6 +163,8 @@ async def _update_field(
                 "the edit control."
             )
 
+        await page.evaluate("() => new Promise((r) => setTimeout(r, 1500))")
+
         set_result = await page.evaluate(
             _SET_FIELD_JS, {"value": new_value, "field": field}
         )
