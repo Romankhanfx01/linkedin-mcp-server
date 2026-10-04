@@ -101,7 +101,7 @@ async def _save_toggle(
             # silently. Revert by flipping back once.
             await page.evaluate(_SAVE_TOGGLE_JS)
             raise ToolError(
-                f"The job was already in the opposite state; no change made."
+                "The job was already in the opposite state; no change made."
             )
 
         verified = await page.evaluate(_VERIFY_SAVE_JS)
