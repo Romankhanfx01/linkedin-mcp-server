@@ -53,6 +53,7 @@ class LinkedInExtractor:
 
         self._content = content
         self._capture = capture
+        self._session = session
         self._feed = FeedReader(session, navigator, content)
         self._message_sender = message_sender
         self._person = person
@@ -68,6 +69,11 @@ class LinkedInExtractor:
         self._conversations = ConversationReader(
             session, navigator, content, profile_page
         )
+
+    @property
+    def page(self) -> Page:
+        """The authenticated page backing every workflow on this extractor."""
+        return self._session.page
 
     async def get_page_text(self) -> str:
         """Extract innerText from the main content area of the current page."""
