@@ -42,7 +42,7 @@ _OPEN_EDIT_JS = """(field) => {
 _SET_FIELD_JS = """(payload) => {
   const { value, field } = payload;
   const editors = Array.from(
-    document.querySelectorAll('textarea, [contenteditable="true"], input[type="text"]'),
+    document.querySelectorAll('textarea, [contenteditable], input[type="text"], [role="textbox"]'),
   ).filter((el) => el.offsetParent !== null);
   if (editors.length === 0) return { status: 'no_editor' };
   let editor = null;
