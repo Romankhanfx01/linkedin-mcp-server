@@ -24,8 +24,16 @@ _OPEN_EDIT_JS = """(field) => {
       const label = (
         el.getAttribute('aria-label') || el.getAttribute('title') || ''
       ).toLowerCase();
-      return label === 'edit profile' || label.includes('edit intro');
+      return el.tagName === 'BUTTON' && label === 'edit';
     });
+    if (!match) {
+      match = controls.find((el) => {
+        const label = (
+          el.getAttribute('aria-label') || el.getAttribute('title') || ''
+        ).toLowerCase();
+        return label === 'edit profile' || label.includes('edit intro');
+      });
+    }
   } else {
     match = controls.find((el) => {
       const label = (
@@ -48,22 +56,32 @@ _SET_FIELD_JS = """(payload) => {
   let editor = null;
   if (field === 'headline') {
     editor = editors.find((el) => {
+      const labelText = (
+        el.closest('label, fieldset, div')?.querySelector('label, span')
+          ?.innerText || ''
+      ).toLowerCase();
       const hay = [
         el.getAttribute('aria-label') || '',
         el.getAttribute('placeholder') || '',
         el.getAttribute('name') || '',
         el.getAttribute('id') || '',
+        labelText,
       ].join(' ').toLowerCase();
       return hay.includes('headline') || hay.includes('intro');
     }) || null;
     if (!editor) editor = editors.length === 1 ? editors[0] : null;
   } else {
     editor = editors.find((el) => {
+      const labelText = (
+        el.closest('label, fieldset, div')?.querySelector('label, span')
+          ?.innerText || ''
+      ).toLowerCase();
       const hay = [
         el.getAttribute('aria-label') || '',
         el.getAttribute('placeholder') || '',
         el.getAttribute('name') || '',
         el.getAttribute('id') || '',
+        labelText,
       ].join(' ').toLowerCase();
       return hay.includes('summary') || hay.includes('about');
     }) || null;
