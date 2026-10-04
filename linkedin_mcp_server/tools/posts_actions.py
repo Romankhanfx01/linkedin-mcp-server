@@ -33,7 +33,7 @@ _OPEN_COMPOSER_JS = """() => {
 
 _SET_POST_TEXT_JS = """(value) => {
   const editors = Array.from(
-    document.querySelectorAll('[contenteditable="true"], textarea'),
+    document.querySelectorAll('textarea, [contenteditable], input[type="text"], [role="textbox"]'),
   ).filter((el) => el.offsetParent !== null);
   if (editors.length === 0) return { status: 'no_editor' };
   const editor = editors[0];
