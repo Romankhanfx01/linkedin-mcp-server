@@ -1,5 +1,6 @@
 """Posting/content mutation tools: create, delete, create-with-image."""
 
+import asyncio
 import logging
 from typing import Any
 
@@ -15,11 +16,13 @@ logger = logging.getLogger(__name__)
 
 _OPEN_COMPOSER_JS = """() => {
   const controls = Array.from(
-    document.querySelectorAll('button, [role="button"], a'),
+    document.querySelectorAll('button, [role="button"], a, div, span'),
   );
   const match = controls.find((el) => {
     const label = (
-      el.getAttribute('aria-label') || el.getAttribute('title') || ''
+      el.getAttribute('aria-label') ||
+      el.getAttribute('title') ||
+      (el.innerText || '').trim()
     ).toLowerCase();
     return label.includes('start a post') || label.includes('create a post');
   });
@@ -136,6 +139,8 @@ async def _create_post(
                 "Could not open the LinkedIn post composer; the feed page did "
                 "not expose a post creation control."
             )
+
+        await asyncio.sleep(1.5)
 
         set_result = await page.evaluate(_SET_POST_TEXT_JS, text)
         if not isinstance(set_result, dict) or set_result.get("status") != "set":
