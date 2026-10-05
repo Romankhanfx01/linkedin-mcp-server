@@ -20,20 +20,15 @@ _OPEN_EDIT_JS = """(field) => {
   );
   let match;
   if (field === 'headline') {
+    // Prefer the "Edit profile" anchor that opens the intro dialog; the
+    // generic aria-label==="Edit" button is for a different section
+    // (Edit default activity) and must not be used for headline.
     match = controls.find((el) => {
       const label = (
         el.getAttribute('aria-label') || el.getAttribute('title') || ''
       ).toLowerCase();
-      return el.tagName === 'BUTTON' && label === 'edit';
+      return label === 'edit profile' || label.includes('edit intro');
     });
-    if (!match) {
-      match = controls.find((el) => {
-        const label = (
-          el.getAttribute('aria-label') || el.getAttribute('title') || ''
-        ).toLowerCase();
-        return label === 'edit profile' || label.includes('edit intro');
-      });
-    }
   } else {
     match = controls.find((el) => {
       const label = (
