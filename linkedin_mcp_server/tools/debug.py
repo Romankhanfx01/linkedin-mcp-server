@@ -4,6 +4,7 @@ import logging
 from typing import Any
 
 from fastmcp import Context, FastMCP
+from fastmcp.exceptions import ToolError
 
 from linkedin_mcp_server.config.schema import DEFAULT_TOOL_TIMEOUT_SECONDS
 from linkedin_mcp_server.dependencies import get_ready_extractor
@@ -59,3 +60,76 @@ def register_debug_tools(
         page = extractor.page
         result = await page.evaluate(_DUMP_CONTROLS_JS)
         return result if isinstance(result, dict) else {"status": "unexpected"}
+
+    @mcp.tool(
+        timeout=tool_timeout,
+        title="Remove Skill",
+        annotations={"destructiveHint": True, "openWorldHint": True},
+        tags={"debug"},
+    )
+    async def remove_skill(skill_name: str, ctx: Context, dry_run: bool = False) -> dict[str, Any]:
+        """Remove a skill from the profile's skills section."""
+        extractor = await get_ready_extractor(ctx, tool_name="remove_skill")
+        await extractor.extract_page(
+            "https://www.linkedin.com/in/muhammad-roman-dev/details/skills/",
+            "profile",
+        )
+        page = extractor.page
+        opened = await page.evaluate(
+            """(name) => {
+              const anchors = Array.from(
+                document.querySelectorAll('a[aria-label*="Edit"]'),
+              );
+              const target = anchors.find((a) => {
+                const l = (a.getAttribute('aria-label') || '').toLowerCase();
+                return l.includes((name || '').toLowerCase());
+              });
+              if (!target) return { status: 'not_found' };
+              target.click();
+              return { status: 'clicked' };
+            }""",
+            skill_name,
+        )
+        if not isinstance(opened, dict) or opened.get("status") != "clicked":
+            raise ToolError(f"Skill '{skill_name}' edit control not found.")
+        import asyncio as _asyncio
+
+        await _asyncio.sleep(2)
+        deleted = await page.evaluate(
+            """() => {
+              const btns = Array.from(document.querySelectorAll('button')).filter(
+                (b) => b.offsetParent !== null,
+              );
+              const del = btns.find((b) => {
+                const l = (
+                  (b.innerText || '') + ' ' + (b.getAttribute('aria-label') || '')
+                ).toLowerCase();
+                return l.includes('delete');
+              });
+              if (!del) return { status: 'no_delete' };
+              del.click();
+              return { status: 'clicked' };
+            }"""
+        )
+        if not isinstance(deleted, dict) or deleted.get("status") != "clicked":
+            raise ToolError(f"Delete control for '{skill_name}' not found.")
+        if dry_run:
+            return {"status": "dry_run", "skill": skill_name}
+        await _asyncio.sleep(2)
+        confirmed = await page.evaluate(
+            """() => {
+              const btns = Array.from(document.querySelectorAll('button')).filter(
+                (b) => b.offsetParent !== null,
+              );
+              const ok = btns.find((b) => {
+                const l = (
+                  (b.innerText || '') + ' ' + (b.getAttribute('aria-label') || '')
+                ).toLowerCase();
+                return l.includes('delete') || l.includes('confirm');
+              });
+              if (!ok) return { status: 'no_confirm' };
+              ok.click();
+              return { status: 'confirmed' };
+            }"""
+        )
+        return {"status": "removed", "skill": skill_name, "confirmed": confirmed.get("status") == "confirmed"}
