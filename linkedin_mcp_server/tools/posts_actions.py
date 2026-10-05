@@ -130,15 +130,10 @@ async def _create_post(
 ) -> dict[str, Any]:
     try:
         extractor = await get_ready_extractor(ctx, tool_name=tool_name)
-        await extractor.extract_page("https://www.linkedin.com/feed/", "feed")
+        await extractor.extract_page(
+            "https://www.linkedin.com/sharing/compose/", "feed"
+        )
         page = extractor.page
-
-        opened = await page.evaluate(_OPEN_COMPOSER_JS)
-        if not isinstance(opened, dict) or opened.get("status") != "opened":
-            raise ToolError(
-                "Could not open the LinkedIn post composer; the feed page did "
-                "not expose a post creation control."
-            )
 
         await asyncio.sleep(1.5)
 

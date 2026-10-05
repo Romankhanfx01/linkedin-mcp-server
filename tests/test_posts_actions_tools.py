@@ -43,7 +43,6 @@ def serve_extractor(monkeypatch: pytest.MonkeyPatch):
 async def test_create_post_success(mock_context, serve_extractor):
     extractor = _make_extractor(
         [
-            {"status": "opened"},
             {"status": "set", "text": "Hello world"},
             {"status": "posted"},
             {"status": "ok"},
@@ -64,7 +63,6 @@ async def test_create_post_success(mock_context, serve_extractor):
 async def test_create_post_dry_run_skips_submit(mock_context, serve_extractor):
     extractor = _make_extractor(
         [
-            {"status": "opened"},
             {"status": "set", "text": "Draft"},
         ]
     )
@@ -77,18 +75,18 @@ async def test_create_post_dry_run_skips_submit(mock_context, serve_extractor):
     result = await tool_fn("Draft", mock_context, dry_run=True)
 
     assert result["status"] == "dry_run"
-    assert extractor.page.evaluate.await_count == 2
+    assert extractor.page.evaluate.await_count == 1
 
 
 async def test_create_post_composer_missing(mock_context, serve_extractor):
-    extractor = _make_extractor([{"status": "not_found"}])
+    extractor = _make_extractor([{"status": "no_editor"}])
     serve_extractor(extractor)
 
     mcp = FastMCP("test")
     register_posts_actions_tools(mcp)
     tool_fn = await get_tool_fn(mcp, "create_post")
 
-    with pytest.raises(ToolError, match="post composer"):
+    with pytest.raises(ToolError, match="Could not write text"):
         await tool_fn("Hello", mock_context)
 
 
@@ -134,7 +132,6 @@ async def test_delete_post_dry_run(mock_context, serve_extractor):
 async def test_create_post_with_image_success(mock_context, serve_extractor):
     extractor = _make_extractor(
         [
-            {"status": "opened"},
             {"status": "set", "text": "With image"},
             {"status": "posted"},
             {"status": "ok"},
