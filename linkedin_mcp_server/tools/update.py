@@ -50,36 +50,50 @@ _SET_FIELD_JS = """(payload) => {
   if (editors.length === 0) return { status: 'no_editor' };
   let editor = null;
   if (field === 'headline') {
-    editor = editors.find((el) => {
-      const labelText = (
-        el.closest('label, fieldset, div')?.querySelector('label, span')
-          ?.innerText || ''
-      ).toLowerCase();
-      const hay = [
-        el.getAttribute('aria-label') || '',
-        el.getAttribute('placeholder') || '',
-        el.getAttribute('name') || '',
-        el.getAttribute('id') || '',
-        labelText,
-      ].join(' ').toLowerCase();
-      return hay.includes('headline') || hay.includes('intro');
-    }) || null;
+    // The intro form's headline is a rich-text div (no aria-label/placeholder);
+    // pick the visible DIV textbox directly, then fall back to label matching.
+    editor = editors.find((el) =>
+      el.tagName === 'DIV' &&
+      (el.getAttribute('contenteditable') !== null || el.getAttribute('role') === 'textbox'),
+    ) || null;
+    if (!editor) {
+      editor = editors.find((el) => {
+        const labelText = (
+          el.closest('label, fieldset, div')?.querySelector('label, span')
+            ?.innerText || ''
+        ).toLowerCase();
+        const hay = [
+          el.getAttribute('aria-label') || '',
+          el.getAttribute('placeholder') || '',
+          el.getAttribute('name') || '',
+          el.getAttribute('id') || '',
+          labelText,
+        ].join(' ').toLowerCase();
+        return hay.includes('headline') || hay.includes('intro');
+      }) || null;
+    }
     if (!editor) editor = editors.length === 1 ? editors[0] : null;
   } else {
-    editor = editors.find((el) => {
-      const labelText = (
-        el.closest('label, fieldset, div')?.querySelector('label, span')
-          ?.innerText || ''
-      ).toLowerCase();
-      const hay = [
-        el.getAttribute('aria-label') || '',
-        el.getAttribute('placeholder') || '',
-        el.getAttribute('name') || '',
-        el.getAttribute('id') || '',
-        labelText,
-      ].join(' ').toLowerCase();
-      return hay.includes('summary') || hay.includes('about');
-    }) || null;
+    editor = editors.find((el) =>
+      el.tagName === 'DIV' &&
+      (el.getAttribute('contenteditable') !== null || el.getAttribute('role') === 'textbox'),
+    ) || null;
+    if (!editor) {
+      editor = editors.find((el) => {
+        const labelText = (
+          el.closest('label, fieldset, div')?.querySelector('label, span')
+            ?.innerText || ''
+        ).toLowerCase();
+        const hay = [
+          el.getAttribute('aria-label') || '',
+          el.getAttribute('placeholder') || '',
+          el.getAttribute('name') || '',
+          el.getAttribute('id') || '',
+          labelText,
+        ].join(' ').toLowerCase();
+        return hay.includes('summary') || hay.includes('about');
+      }) || null;
+    }
     if (!editor && editors.length === 1) editor = editors[0];
   }
   if (!editor) return { status: 'ambiguous_editor' };
