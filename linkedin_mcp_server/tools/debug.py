@@ -72,7 +72,7 @@ def register_debug_tools(
         extractor = await get_ready_extractor(ctx, tool_name="remove_skill")
         await extractor.extract_page(
             "https://www.linkedin.com/in/muhammad-roman-dev/details/skills/",
-            "profile",
+            "main_profile",
         )
         page = extractor.page
         opened = await page.evaluate(
