@@ -52,12 +52,40 @@ def register_debug_tools(
         tags={"debug"},
     )
     async def debug_profile_controls(
-        ctx: Context, url: str = "https://www.linkedin.com/in/me/"
+        ctx: Context,
+        url: str = "https://www.linkedin.com/in/me/",
+        after_click_aria_label: str | None = None,
     ) -> dict[str, Any]:
         """Dump visible button/link controls on a profile page."""
         extractor = await get_ready_extractor(ctx, tool_name="debug_profile_controls")
         await extractor.extract_page(url, "main_profile")
         page = extractor.page
+        if after_click_aria_label:
+            await page.evaluate(
+                """(label) => {
+                  const els = Array.from(
+                    document.querySelectorAll('main button, main a, main [role="button"], main div, main span'),
+                  ).filter((el) => el.offsetParent !== null);
+                  const needle = (label || '').toLowerCase();
+                  const target = els.find((el) => {
+                    const t = (
+                      (el.getAttribute('aria-label') || '') + ' ' +
+                      (el.getAttribute('title') || '') + ' ' +
+                      (el.innerText || '')
+                    ).toLowerCase();
+                    return t.includes(needle);
+                  });
+                  if (target) {
+                    target.click();
+                    return { status: 'clicked' };
+                  }
+                  return { status: 'not_found' };
+                }""",
+                after_click_aria_label,
+            )
+            import asyncio as _asyncio
+
+            await _asyncio.sleep(2)
         result = await page.evaluate(_DUMP_CONTROLS_JS)
         return result if isinstance(result, dict) else {"status": "unexpected"}
 
