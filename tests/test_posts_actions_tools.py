@@ -79,7 +79,7 @@ async def test_create_post_dry_run_skips_submit(mock_context, serve_extractor):
 
 
 async def test_create_post_composer_missing(mock_context, serve_extractor):
-    extractor = _make_extractor([{"status": "no_editor"}])
+    extractor = _make_extractor([{"status": "no_editor"}, {"status": "no_editor"}])
     serve_extractor(extractor)
 
     mcp = FastMCP("test")

@@ -114,7 +114,7 @@ async def test_update_about_no_edit_control(mock_context, serve_extractor):
 
 
 async def test_update_headline_editor_not_writable(mock_context, serve_extractor):
-    extractor = _make_extractor([{"status": "opened"}, {"status": "no_editor"}])
+    extractor = _make_extractor([{"status": "opened"}, {"status": "no_editor"}, {"status": "no_editor"}])
     serve_extractor(extractor)
 
     mcp = FastMCP("test")

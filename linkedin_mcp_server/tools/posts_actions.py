@@ -135,9 +135,12 @@ async def _create_post(
         )
         page = extractor.page
 
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(2.0)
 
         set_result = await page.evaluate(_SET_POST_TEXT_JS, text)
+        if not isinstance(set_result, dict) or set_result.get("status") != "set":
+            await asyncio.sleep(2.0)
+            set_result = await page.evaluate(_SET_POST_TEXT_JS, text)
         if not isinstance(set_result, dict) or set_result.get("status") != "set":
             status = (
                 set_result.get("status")

@@ -16,17 +16,23 @@ logger = logging.getLogger(__name__)
 _NOTIFICATIONS_URL = "https://www.linkedin.com/notifications/"
 
 _LIST_NOTIFICATIONS_JS = """() => {
+  const navTerms = ['home', 'my network', 'jobs', 'messaging', 'notifications', 'more', 'for business', 'try premium'];
   const items = Array.from(
-    document.querySelectorAll('li, [data-finite-scroll-hotspot], section li'),
+    document.querySelectorAll('main li, main section [data-finite-scroll-hotspot], main ul li'),
   ).filter((el) => el.offsetParent !== null);
   const rows = [];
+  const seen = new Set();
   for (const item of items) {
     const text = (item.innerText || '').trim();
     if (!text) continue;
+    const firstLine = text.split('\\n')[0].trim();
+    if (!firstLine || seen.has(firstLine)) continue;
+    if (navTerms.includes(firstLine.toLowerCase())) continue;
     const dot = item.querySelector(
       '[class*="unread"], [aria-label*="unread"], [data-test-unread]',
     );
-    rows.push({ text: text.split('\\n')[0], unread: dot !== null });
+    rows.push({ text: firstLine, unread: dot !== null });
+    seen.add(firstLine);
   }
   return { status: 'ok', notifications: rows.slice(0, 50) };
 }"""

@@ -182,11 +182,16 @@ async def _update_field(
                 "the edit control."
             )
 
-        await asyncio.sleep(1.5)
+        await asyncio.sleep(2.0)
 
         set_result = await page.evaluate(
             _SET_FIELD_JS, {"value": new_value, "field": field}
         )
+        if not isinstance(set_result, dict) or set_result.get("status") != "set":
+            await asyncio.sleep(2.0)
+            set_result = await page.evaluate(
+                _SET_FIELD_JS, {"value": new_value, "field": field}
+            )
         if not isinstance(set_result, dict) or set_result.get("status") != "set":
             status = (
                 set_result.get("status")
