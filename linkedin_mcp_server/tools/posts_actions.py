@@ -18,7 +18,7 @@ _OPEN_COMPOSER_JS = """() => {
   const controls = Array.from(
     document.querySelectorAll('button, [role="button"], a, div, span'),
   );
-  const match = controls.find((el) => {
+  const matches = controls.filter((el) => {
     const label = (
       el.getAttribute('aria-label') ||
       el.getAttribute('title') ||
@@ -26,8 +26,15 @@ _OPEN_COMPOSER_JS = """() => {
     ).toLowerCase();
     return label.includes('start a post') || label.includes('create a post');
   });
-  if (!match) return { status: 'not_found' };
-  match.click();
+  if (matches.length === 0) return { status: 'not_found' };
+  // Prefer the deepest match (the actual placeholder/container that is
+  // clicked), falling back to the first in DOM order.
+  const match = matches.reduce((best, el) =>
+    el.querySelectorAll('*').length < best.querySelectorAll('*').length
+      ? el
+      : best,
+  );
+  match.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   return { status: 'opened' };
 }"""
 
@@ -130,10 +137,15 @@ async def _create_post(
 ) -> dict[str, Any]:
     try:
         extractor = await get_ready_extractor(ctx, tool_name=tool_name)
-        await extractor.extract_page(
-            "https://www.linkedin.com/sharing/compose/", "feed"
-        )
+        await extractor.extract_page("https://www.linkedin.com/feed/", "feed")
         page = extractor.page
+
+        opened = await page.evaluate(_OPEN_COMPOSER_JS)
+        if not isinstance(opened, dict) or opened.get("status") != "opened":
+            raise ToolError(
+                "Could not open the LinkedIn post composer; the feed page did "
+                "not expose a post creation control."
+            )
 
         await asyncio.sleep(2.0)
 
