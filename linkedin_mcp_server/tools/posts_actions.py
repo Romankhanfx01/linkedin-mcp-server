@@ -172,9 +172,7 @@ async def _create_post(
         submitted = await page.evaluate(_SUBMIT_POST_JS)
         if not isinstance(submitted, dict) or submitted.get("status") != "posted":
             status = (
-                submitted.get("status")
-                if isinstance(submitted, dict)
-                else "unexpected"
+                submitted.get("status") if isinstance(submitted, dict) else "unexpected"
             )
             raise ToolError(f"The post dialog has no Post button (status: {status}).")
 
@@ -225,7 +223,9 @@ async def _delete_post(
 
         confirmed = await page.evaluate(_CONFIRM_DELETE_JS)
         if not isinstance(confirmed, dict) or confirmed.get("status") != "confirmed":
-            raise ToolError("The delete confirmation dialog did not expose a delete button.")
+            raise ToolError(
+                "The delete confirmation dialog did not expose a delete button."
+            )
 
         await ctx.report_progress(progress=100, total=100, message="Complete")
         return {"status": "deleted", "url": post_url}
@@ -253,7 +253,9 @@ def register_posts_actions_tools(
         annotations={"destructiveHint": True, "openWorldHint": True},
         tags={"post", "actions"},
     )
-    async def create_post(text: str, ctx: Context, dry_run: bool = False) -> dict[str, Any]:
+    async def create_post(
+        text: str, ctx: Context, dry_run: bool = False
+    ) -> dict[str, Any]:
         """Create a new text post on LinkedIn.
 
         Args:

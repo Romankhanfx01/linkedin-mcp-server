@@ -210,9 +210,7 @@ async def _reply(
 
         opened = await page.evaluate(_OPEN_REPLY_JS, comment_index)
         if not isinstance(opened, dict) or opened.get("status") != "opened":
-            raise ToolError(
-                f"No reply control found at comment index {comment_index}."
-            )
+            raise ToolError(f"No reply control found at comment index {comment_index}.")
 
         set_result = await page.evaluate(_SET_COMMENT_JS, text)
         if not isinstance(set_result, dict) or set_result.get("status") != "set":
@@ -334,7 +332,11 @@ def register_engagement_tools(
         tags={"post", "actions"},
     )
     async def reply_to_comment(
-        post_url: str, comment_index: int, text: str, ctx: Context, dry_run: bool = False
+        post_url: str,
+        comment_index: int,
+        text: str,
+        ctx: Context,
+        dry_run: bool = False,
     ) -> dict[str, Any]:
         """Reply to a comment on a LinkedIn post.
 

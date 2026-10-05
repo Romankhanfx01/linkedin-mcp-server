@@ -124,7 +124,11 @@ async def test_update_setting_dry_run(mock_context, serve_extractor):
     tool_fn = await get_tool_fn(mcp, "update_setting")
 
     result = await tool_fn(
-        "/settings/visibility/", "Profile visibility", "Anyone", mock_context, dry_run=True
+        "/settings/visibility/",
+        "Profile visibility",
+        "Anyone",
+        mock_context,
+        dry_run=True,
     )
 
     assert result["status"] == "dry_run"

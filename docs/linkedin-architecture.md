@@ -105,6 +105,7 @@ a page-owning collaborator.
 - `_message_sender`
 - `_person`
 - `_posts`
+- `_session`
 
 ## Dependency-direction violations
 

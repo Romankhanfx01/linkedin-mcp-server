@@ -94,9 +94,7 @@ async def _get_notifications(ctx: Context, *, tool_name: str) -> dict[str, Any]:
     return {}  # unreachable
 
 
-async def _mark_read(
-    ctx: Context, *, tool_name: str, dry_run: bool
-) -> dict[str, Any]:
+async def _mark_read(ctx: Context, *, tool_name: str, dry_run: bool) -> dict[str, Any]:
     try:
         extractor = await get_ready_extractor(ctx, tool_name=tool_name)
         await extractor.extract_page(_NOTIFICATIONS_URL, "notifications")
@@ -104,9 +102,7 @@ async def _mark_read(
 
         clicked = await page.evaluate(_MARK_ALL_READ_JS)
         if not isinstance(clicked, dict) or clicked.get("status") != "clicked":
-            raise ToolError(
-                "No mark-all-read control found on the notifications page."
-            )
+            raise ToolError("No mark-all-read control found on the notifications page.")
 
         if dry_run:
             return {"status": "dry_run"}

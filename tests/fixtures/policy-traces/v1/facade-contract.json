@@ -119,10 +119,82 @@
       "send_message"
     ],
     "tool_schemas": {
+      "accept_invitation": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, locate the control but do not click.",
+              "type": "boolean"
+            },
+            "name": {
+              "description": "Sender display name as shown in the invitation row.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "apply_to_job": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "job_url": {
+              "description": "Full URL of the job posting.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "job_url"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
       "close_session": {
         "input": {
           "additionalProperties": false,
           "properties": {},
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "comment_on_post": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, fill the comment but do not submit.",
+              "type": "boolean"
+            },
+            "post_url": {
+              "description": "Full URL of the post.",
+              "type": "string"
+            },
+            "text": {
+              "description": "Comment body text.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_url",
+            "text"
+          ],
           "type": "object"
         },
         "output": {
@@ -149,6 +221,172 @@
               ],
               "default": null,
               "description": "Optional note to include with the invitation"
+            }
+          },
+          "required": [
+            "linkedin_username"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "create_post": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, compose the post but do not publish.",
+              "type": "boolean"
+            },
+            "text": {
+              "description": "The post body text.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "text"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "create_post_with_image": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, compose the post but do not publish.",
+              "type": "boolean"
+            },
+            "image_path": {
+              "description": "Local path to the image file to attach.",
+              "type": "string"
+            },
+            "text": {
+              "description": "The post body text.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "text",
+            "image_path"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "debug_profile_controls": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "after_click_aria_label": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "url": {
+              "default": "https://www.linkedin.com/in/me/",
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "decline_invitation": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, locate the control but do not click.",
+              "type": "boolean"
+            },
+            "name": {
+              "description": "Sender display name as shown in the invitation row.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "delete_post": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, navigate to the delete confirmation but do not confirm.",
+              "type": "boolean"
+            },
+            "post_url": {
+              "description": "Full URL of the post (e.g. /feed/update/urn:li:...).",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "follow_company": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "company_slug": {
+              "description": "LinkedIn company URL slug (e.g. \"acme-corp\").",
+              "type": "string"
+            }
+          },
+          "required": [
+            "company_slug"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "follow_person": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "linkedin_username": {
+              "description": "LinkedIn username (e.g. \"alice\").",
+              "type": "string"
             }
           },
           "required": [
@@ -412,6 +650,17 @@
           "type": "object"
         }
       },
+      "get_notifications": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
       "get_person_profile": {
         "input": {
           "additionalProperties": false,
@@ -457,6 +706,25 @@
           "type": "object"
         }
       },
+      "get_post_reactions": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "post_url": {
+              "description": "Full URL of the post.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_url"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
       "get_saved_jobs": {
         "input": {
           "additionalProperties": false,
@@ -476,6 +744,25 @@
           "type": "object"
         }
       },
+      "get_setting": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "section_url": {
+              "description": "Full URL of the settings section (e.g.\nhttps://www.linkedin.com/settings/visibility/).",
+              "type": "string"
+            }
+          },
+          "required": [
+            "section_url"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
       "get_sidebar_profiles": {
         "input": {
           "additionalProperties": false,
@@ -487,6 +774,144 @@
           },
           "required": [
             "linkedin_username"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "list_pending_invitations": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "list_settings_sections": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {},
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "mark_notifications_read": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, locate the control but do not click.",
+              "type": "boolean"
+            }
+          },
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "react_to_post": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "post_url": {
+              "description": "Full URL of the post.",
+              "type": "string"
+            },
+            "reaction": {
+              "description": "Reaction type, e.g. \"like\", \"celebrate\", \"love\",\n\"insightful\", \"funny\", \"support\". \"like\" is the default.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_url",
+            "reaction"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "remove_skill": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "type": "boolean"
+            },
+            "skill_name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "skill_name"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "reply_to_comment": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "comment_index": {
+              "description": "Zero-based index of the target comment.",
+              "type": "integer"
+            },
+            "dry_run": {
+              "default": false,
+              "description": "When True, fill the reply but do not submit.",
+              "type": "boolean"
+            },
+            "post_url": {
+              "description": "Full URL of the post.",
+              "type": "string"
+            },
+            "text": {
+              "description": "Reply body text.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "post_url",
+            "comment_index",
+            "text"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "save_job": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "job_url": {
+              "description": "Full URL of the job posting.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "job_url"
           ],
           "type": "object"
         },
@@ -772,6 +1197,169 @@
             "linkedin_username",
             "message",
             "confirm_send"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "unfollow_company": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "company_slug": {
+              "description": "LinkedIn company URL slug (e.g. \"acme-corp\").",
+              "type": "string"
+            }
+          },
+          "required": [
+            "company_slug"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "unfollow_person": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "linkedin_username": {
+              "description": "LinkedIn username (e.g. \"alice\").",
+              "type": "string"
+            }
+          },
+          "required": [
+            "linkedin_username"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "unsave_job": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "job_url": {
+              "description": "Full URL of the job posting.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "job_url"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "update_about": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "new_about": {
+              "description": "The new About section text.",
+              "type": "string"
+            },
+            "url": {
+              "description": "Full LinkedIn profile URL to edit (must be your own profile).",
+              "type": "string"
+            }
+          },
+          "required": [
+            "url",
+            "new_about"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "update_headline": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "new_headline": {
+              "description": "The new headline text.",
+              "type": "string"
+            },
+            "url": {
+              "description": "Full LinkedIn profile URL to edit (must be your own profile).",
+              "type": "string"
+            }
+          },
+          "required": [
+            "url",
+            "new_headline"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "update_setting": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, locate the setting but do not change it.",
+              "type": "boolean"
+            },
+            "name": {
+              "description": "The setting name as shown on the page.",
+              "type": "string"
+            },
+            "section_url": {
+              "description": "Full URL of the settings section.",
+              "type": "string"
+            },
+            "value": {
+              "description": "The desired value (matched against option text for\nselects; for checkboxes/switches the click toggles).",
+              "type": "string"
+            }
+          },
+          "required": [
+            "section_url",
+            "name",
+            "value"
+          ],
+          "type": "object"
+        },
+        "output": {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      },
+      "withdraw_connection_request": {
+        "input": {
+          "additionalProperties": false,
+          "properties": {
+            "dry_run": {
+              "default": false,
+              "description": "When True, locate the control but do not click.",
+              "type": "boolean"
+            },
+            "name": {
+              "description": "Target display name as shown in the sent invitations list.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
           ],
           "type": "object"
         },

@@ -95,7 +95,9 @@ def register_debug_tools(
         annotations={"destructiveHint": True, "openWorldHint": True},
         tags={"debug"},
     )
-    async def remove_skill(skill_name: str, ctx: Context, dry_run: bool = False) -> dict[str, Any]:
+    async def remove_skill(
+        skill_name: str, ctx: Context, dry_run: bool = False
+    ) -> dict[str, Any]:
         """Remove a skill from the profile's skills section."""
         extractor = await get_ready_extractor(ctx, tool_name="remove_skill")
         await extractor.extract_page(
@@ -160,4 +162,8 @@ def register_debug_tools(
               return { status: 'confirmed' };
             }"""
         )
-        return {"status": "removed", "skill": skill_name, "confirmed": confirmed.get("status") == "confirmed"}
+        return {
+            "status": "removed",
+            "skill": skill_name,
+            "confirmed": confirmed.get("status") == "confirmed",
+        }

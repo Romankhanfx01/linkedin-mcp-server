@@ -81,7 +81,9 @@ async def test_create_post_dry_run_skips_submit(mock_context, serve_extractor):
 
 
 async def test_create_post_composer_missing(mock_context, serve_extractor):
-    extractor = _make_extractor([{"status": "opened"}, {"status": "no_editor"}, {"status": "no_editor"}])
+    extractor = _make_extractor(
+        [{"status": "opened"}, {"status": "no_editor"}, {"status": "no_editor"}]
+    )
     serve_extractor(extractor)
 
     mcp = FastMCP("test")
@@ -107,7 +109,9 @@ async def test_delete_post_success(mock_context, serve_extractor):
     register_posts_actions_tools(mcp)
     tool_fn = await get_tool_fn(mcp, "delete_post")
 
-    result = await tool_fn("https://www.linkedin.com/feed/update/urn:li:activity:1/", mock_context)
+    result = await tool_fn(
+        "https://www.linkedin.com/feed/update/urn:li:activity:1/", mock_context
+    )
 
     assert result["status"] == "deleted"
 
@@ -125,7 +129,11 @@ async def test_delete_post_dry_run(mock_context, serve_extractor):
     register_posts_actions_tools(mcp)
     tool_fn = await get_tool_fn(mcp, "delete_post")
 
-    result = await tool_fn("https://www.linkedin.com/feed/update/urn:li:activity:1/", mock_context, dry_run=True)
+    result = await tool_fn(
+        "https://www.linkedin.com/feed/update/urn:li:activity:1/",
+        mock_context,
+        dry_run=True,
+    )
 
     assert result["status"] == "dry_run"
     assert extractor.page.evaluate.await_count == 2

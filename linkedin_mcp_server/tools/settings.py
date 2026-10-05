@@ -162,9 +162,7 @@ async def _update_setting(
 
         located = await page.evaluate(_LOCATE_SETTING_JS, name)
         if not isinstance(located, dict) or located.get("status") != "located":
-            raise ToolError(
-                f"Setting '{name}' was not found in this settings section."
-            )
+            raise ToolError(f"Setting '{name}' was not found in this settings section.")
 
         if dry_run:
             return {"status": "dry_run", "name": name, "value": value}
@@ -174,13 +172,9 @@ async def _update_setting(
         )
         if not isinstance(updated, dict) or updated.get("status") != "updated":
             status = (
-                updated.get("status")
-                if isinstance(updated, dict)
-                else "unexpected"
+                updated.get("status") if isinstance(updated, dict) else "unexpected"
             )
-            raise ToolError(
-                f"Could not update setting '{name}' (status: {status})."
-            )
+            raise ToolError(f"Could not update setting '{name}' (status: {status}).")
 
         await page.evaluate(_VERIFY_SETTING_JS)
         await ctx.report_progress(progress=100, total=100, message="Complete")
@@ -237,9 +231,7 @@ def register_settings_tools(
         Returns:
             Dict with status and settings list (name, value).
         """
-        return await _get_setting(
-            ctx, tool_name="get_setting", section_url=section_url
-        )
+        return await _get_setting(ctx, tool_name="get_setting", section_url=section_url)
 
     @mcp.tool(
         timeout=tool_timeout,
