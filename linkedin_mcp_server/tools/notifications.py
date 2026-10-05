@@ -18,11 +18,16 @@ _NOTIFICATIONS_URL = "https://www.linkedin.com/notifications/"
 _LIST_NOTIFICATIONS_JS = """() => {
   const navTerms = ['home', 'my network', 'jobs', 'messaging', 'notifications', 'more', 'for business', 'try premium'];
   const items = Array.from(
-    document.querySelectorAll('main li, main section [data-finite-scroll-hotspot], main ul li'),
+    document.querySelectorAll('main li, main section li, article, main div[role="listitem"], main ul > div, main section div'),
   ).filter((el) => el.offsetParent !== null);
   const rows = [];
   const seen = new Set();
   for (const item of items) {
+    const hasLink = Array.from(item.querySelectorAll('a')).some((a) => {
+      const href = a.getAttribute('href') || '';
+      return href.includes('/in/') || href.includes('/feed/update') || href.includes('/company/');
+    });
+    if (!hasLink) continue;
     const text = (item.innerText || '').trim();
     if (!text) continue;
     const firstLine = text.split('\\n')[0].trim();
